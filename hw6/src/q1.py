@@ -43,6 +43,11 @@ def renderNDotLSphere(center, rad, light, pxSize, res):
     """
 
     image = None
+    ht, width = res[0], res[1]
+    # get all possible (x,y)
+    dim1, dim2 = np.arange(ht), np.arange(width)
+    x, y = np.meshgrid(dim1, dim2)
+    
     return image
 
 
