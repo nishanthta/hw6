@@ -8,6 +8,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 from utils import integrateFrankot
+import cv2, os
 
 def renderNDotLSphere(center, rad, light, pxSize, res):
 
@@ -47,11 +48,22 @@ def renderNDotLSphere(center, rad, light, pxSize, res):
     # get all possible (x,y)
     dim1, dim2 = np.arange(ht), np.arange(width)
     x, y = np.meshgrid(dim1, dim2)
-    
+    c = (ht / 2., width / 2.)
+    real_x, real_y = (x - c[0]) * pxSize + center[0], (y - c[1]) * pxSize + center[1]
+    real_z = rad**2 - x**2 - y**2
+    neg = real_z < 0
+    real_z[neg] = 0
+    real_z = np.sqrt(real_z) + center[2]
+    n = np.stack((real_x, real_y, real_z), axis = 2)
+    n = n.reshape((ht*width, -1))
+    n = (n.T / np.linalg.norm(n, axis = 1).T).T
+    image = np.dot(n, light)
+    # image[neg] = 0
+    image = image.reshape((ht, width))
     return image
 
 
-def loadData(path = "../data/"):
+def loadData(path = "hw6/data/"):
 
     """
     Question 1 (c)
@@ -81,7 +93,18 @@ def loadData(path = "../data/"):
     I = None
     L = None
     s = None
-
+    for i in range(7):
+        img = cv2.imread(os.path.join(path, 'input_{}.tif'.format(i + 1)))
+        if img is None:
+            print('Empty')
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        ht, width = gray.shape[0], gray.shape[1]
+        gray = gray.reshape((1,ht*width))
+        if i == 0:
+            I = np.zeros((7, ht*width))
+        I[i,:] = gray
+    L = np.load(os.path.join(path, 'sources.npy')).T
+    s = (ht, width)
     return I, L, s
 
 
@@ -107,7 +130,9 @@ def estimatePseudonormalsCalibrated(I, L):
         The 3 x P matrix of pesudonormals
     """
 
-    B = None
+    temp = np.dot(L,L.T)
+    temp = np.linalg.inv(temp).dot(L)
+    B = temp.dot(I)
     return B
 
 
@@ -132,8 +157,10 @@ def estimateAlbedosNormals(B):
         The 3 x P matrix of normals
     '''
 
-    albedos = None
-    normals = None
+    # albedos = None
+    # normals = None
+    albedos = np.linalg.norm(B, axis=0)
+    normals = B / (albedos + 1e-6)
     return albedos, normals
 
 
@@ -225,4 +252,19 @@ def plotSurface(surface):
 if __name__ == '__main__':
 
     # Put your main code here
+    center = np.asarray([0., 0., 0.])
+    rad = 7.5
+    lights = np.asarray([[1, 1, 1]/np.sqrt(3), [1, -1, 1] /
+                         np.sqrt(3), [-1, -1, 1]/np.sqrt(3)])
+    pxSize = 7e-3
+    res = np.asarray([3840, 2160])
+    # for i in range(len(lights)):
+    #     image = renderNDotLSphere(center, rad, lights[i], pxSize, res)
+    #     plt.imshow(image)
+    #     plt.show()
+    #     plt.clf()
+
+    I, L, s = loadData()
+    u, v, vh = np.linalg.svd(I, full_matrices=False)
+
     pass
