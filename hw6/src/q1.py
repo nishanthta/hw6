@@ -254,7 +254,14 @@ def plotSurface(surface):
 
     """
 
-    pass
+    h, w = surface.shape
+    y, x = np.arange(h), np.arange(w)
+    fig = plt.figure()
+    X, Y = np.meshgrid(x, y)
+    ax = plt.axes(projection='3d')
+    ax.plot_surface(X, Y, surface, edgecolor='none', cmap = 'coolwarm')
+    ax.set_title('Surface Plot')
+    plt.show()
 
 
 if __name__ == '__main__':
@@ -279,6 +286,10 @@ if __name__ == '__main__':
     albedos, normals = estimateAlbedosNormals(B)
     albedoIm, normalIm = displayAlbedosNormals(albedos, normals, s)
 
-    plt.imshow(albedoIm, cmap='gray')
-    plt.show()
+    # plt.imshow(albedoIm, cmap='gray')
+    # plt.show()
+
+    surface = -estimateShape(normals, s)
+    plotSurface(surface)
+
     pass
