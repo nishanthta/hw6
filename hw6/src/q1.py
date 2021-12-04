@@ -42,25 +42,22 @@ def renderNDotLSphere(center, rad, light, pxSize, res):
     image : numpy.ndarray
         The rendered image of the hemispherical bowl
     """
-
-    image = None
     ht, width = res[0], res[1]
-    # get all possible (x,y)
-    dim1, dim2 = np.arange(ht), np.arange(width)
-    x, y = np.meshgrid(dim1, dim2)
+    x, y = np.meshgrid(np.arange(ht), np.arange(width))
     c = (ht / 2., width / 2.)
-    real_x, real_y = (x - c[0]) * pxSize + center[0], (y - c[1]) * pxSize + center[1]
-    real_z = rad**2 - x**2 - y**2
-    neg = real_z < 0
-    real_z[neg] = 0
-    real_z = np.sqrt(real_z) + center[2]
-    n = np.stack((real_x, real_y, real_z), axis = 2)
+    real_x = (x - c[0]) * pxSize + center[0]
+    real_y = (y - c[1]) * pxSize + center[1]
+    real_z_sq = rad ** 2 - real_x ** 2 - real_y ** 2
+    neg = real_z_sq < 0
+    real_z_sq[neg] = 0.
+    real_z = np.sqrt(real_z_sq)
+
+    n = np.stack((real_x, real_y, real_z), axis=2)
     n = n.reshape((ht*width, -1))
-    n = (n.T / np.linalg.norm(n, axis = 1).T).T
-    image = np.dot(n, light)
-    # image[neg] = 0
-    image = image.reshape((ht, width))
+    n = (n.T / np.linalg.norm(n, axis=1).T).T
+    image = np.dot(n, light).reshape((width, ht))
     return image
+
 
 
 def loadData(path = "hw6/data/"):
@@ -258,11 +255,11 @@ if __name__ == '__main__':
                          np.sqrt(3), [-1, -1, 1]/np.sqrt(3)])
     pxSize = 7e-3
     res = np.asarray([3840, 2160])
-    # for i in range(len(lights)):
-    #     image = renderNDotLSphere(center, rad, lights[i], pxSize, res)
-    #     plt.imshow(image)
-    #     plt.show()
-    #     plt.clf()
+    for i in range(len(lights)):
+        image = renderNDotLSphere(center, rad, lights[i], pxSize, res)
+        plt.imshow(image)
+        plt.show()
+        plt.clf()
 
     I, L, s = loadData()
     u, v, vh = np.linalg.svd(I, full_matrices=False)
