@@ -195,6 +195,12 @@ def displayAlbedosNormals(albedos, normals, s):
     albedoIm = None
     normalIm = None
 
+    ht, width = s[0], s[1]
+
+    albedoIm = np.reshape((albedos / np.max(albedos)), s)
+    normals = (normals + 1.) / 2.
+    normalIm = np.reshape((normals).T, (ht, width, 3))
+    
     return albedoIm, normalIm
 
 
@@ -222,7 +228,12 @@ def estimateShape(normals, s):
     """
 
     surface = None
-    return surface
+    dx = normals[0, :]/(-1.*normals[2, :] + 1e-6)
+    dy = normals[1, :]/(-1.*normals[2, :] + 1e-6)
+
+    dx, dy = np.reshape(dx, s), np.reshape(dy, s)
+
+    return integrateFrankot(dx, dy)
 
 
 def plotSurface(surface):
@@ -257,11 +268,17 @@ if __name__ == '__main__':
     res = np.asarray([3840, 2160])
     for i in range(len(lights)):
         image = renderNDotLSphere(center, rad, lights[i], pxSize, res)
-        plt.imshow(image)
-        plt.show()
-        plt.clf()
+        # plt.imshow(image)
+        # plt.show()
+        # plt.clf()
 
     I, L, s = loadData()
     u, v, vh = np.linalg.svd(I, full_matrices=False)
 
+    B = estimatePseudonormalsCalibrated(I, L)
+    albedos, normals = estimateAlbedosNormals(B)
+    albedoIm, normalIm = displayAlbedosNormals(albedos, normals, s)
+
+    plt.imshow(albedoIm, cmap='gray')
+    plt.show()
     pass
