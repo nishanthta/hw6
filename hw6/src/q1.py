@@ -14,29 +14,22 @@ def renderNDotLSphere(center, rad, light, pxSize, res):
 
     """
     Question 1 (b)
-
     Render a sphere with a given center and radius. The camera is 
     orthographic and looks towards the sphere in the negative z
     direction. The camera's sensor axes are centerd on and aligned
     with the x- and y-axes.
-
     Parameters
     ----------
     center : numpy.ndarray
         The center of the hemispherical bowl in an array of size (3,)
-
     rad : float
         The radius of the bowl
-
     light : numpy.ndarray
         The direction of incoming light
-
     pxSize : float
         Pixel size
-
     res : numpy.ndarray
         The resolution of the camera frame
-
     Returns
     -------
     image : numpy.ndarray
@@ -64,27 +57,21 @@ def loadData(path = "hw6/data/"):
 
     """
     Question 1 (c)
-
     Load data from the path given. The images are stored as input_n.tif
     for n = {1...7}. The source lighting directions are stored in
     sources.mat.
-
     Paramters
     ---------
     path: str
         Path of the data directory
-
     Returns
     -------
     I : numpy.ndarray
         The 7 x P matrix of vectorized images
-
     L : numpy.ndarray
         The 3 x 7 matrix of lighting directions
-
     s: tuple
         Image shape
-
     """
 
     I = None
@@ -109,18 +96,14 @@ def estimatePseudonormalsCalibrated(I, L):
 
     """
     Question 1 (e)
-
     In calibrated photometric stereo, estimate pseudonormals from the
     light direction and image matrices
-
     Parameters
     ----------
     I : numpy.ndarray
         The 7 x P array of vectorized images
-
     L : numpy.ndarray
         The 3 x 7 array of lighting directions
-
     Returns
     -------
     B : numpy.ndarray
@@ -137,19 +120,15 @@ def estimateAlbedosNormals(B):
 
     '''
     Question 1 (e)
-
     From the estimated pseudonormals, estimate the albedos and normals
-
     Parameters
     ----------
     B : numpy.ndarray
         The 3 x P matrix of estimated pseudonormals
-
     Returns
     -------
     albedos : numpy.ndarray
         The vector of albedos
-
     normals : numpy.ndarray
         The 3 x P matrix of normals
     '''
@@ -165,31 +144,23 @@ def displayAlbedosNormals(albedos, normals, s):
 
     """
     Question 1 (f)
-
     From the estimated pseudonormals, display the albedo and normal maps
-
     Please make sure to use the `coolwarm` colormap for the albedo image
     and the `rainbow` colormap for the normals.
-
     Parameters
     ----------
     albedos : numpy.ndarray
         The vector of albedos
-
     normals : numpy.ndarray
         The 3 x P matrix of normals
-
     s : tuple
         Image shape
-
     Returns
     -------
     albedoIm : numpy.ndarray
         Albedo image of shape s
-
     normalIm : numpy.ndarray
         Normals reshaped as an s x 3 image
-
     """
 
     albedoIm = None
@@ -208,23 +179,18 @@ def estimateShape(normals, s):
 
     """
     Question 1 (i)
-
     Integrate the estimated normals to get an estimate of the depth map
     of the surface.
-
     Parameters
     ----------
     normals : numpy.ndarray
         The 3 x P matrix of normals
-
     s : tuple
         Image shape
-
     Returns
     ----------
     surface: numpy.ndarray
         The image, of size s, of estimated depths at each point
-
     """
 
     surface = None
@@ -240,18 +206,14 @@ def plotSurface(surface):
 
     """
     Question 1 (i) 
-
     Plot the depth map as a surface
-
     Parameters
     ----------
     surface : numpy.ndarray
         The depth map to be plotted
-
     Returns
     -------
         None
-
     """
 
     h, w = surface.shape
@@ -286,8 +248,14 @@ if __name__ == '__main__':
     albedos, normals = estimateAlbedosNormals(B)
     albedoIm, normalIm = displayAlbedosNormals(albedos, normals, s)
 
-    # plt.imshow(albedoIm, cmap='gray')
+    # fig, ax = plt.subplots(nrows = 1, ncols = 2, figsize = (12,6))
+
+    # ax[0].imshow(albedoIm, cmap='gray')
+    # ax[1].imshow(normalIm, cmap='rainbow')
+    # ax[0].axis('off')
+    # ax[1].axis('off')
     # plt.show()
+    # plt.clf()
 
     surface = -estimateShape(normals, s)
     plotSurface(surface)
