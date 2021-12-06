@@ -4,6 +4,8 @@
 # April 20, 2020
 # ##################################################################### #
 
+
+
 import numpy as np
 from q1 import loadData, estimateAlbedosNormals, displayAlbedosNormals
 from q1 import estimateShape, plotSurface 
@@ -42,21 +44,25 @@ def estimatePseudonormalsUncalibrated(I):
 if __name__ == "__main__":
 
     # Put your main code here
-    I, originalL, s = loadData()
+    I, L_orig, s = loadData()
     B, L = estimatePseudonormalsUncalibrated(I)
 
+    print(L_orig, L)
+    # mu, nu, lam = 0.5, 100, 0.5
+    # G = np.array([[1, 0, 0], [0, 1, 0], [mu, nu, lam]])
+    # B = np.linalg.inv(G.T).dot(B)
     albedos, normals = estimateAlbedosNormals(B)
-    # normals = enforceIntegrability(normals, s)
+    normals = enforceIntegrability(normals, s)
     albedoIm, normalIm = displayAlbedosNormals(albedos, normals, s)
 
-    fig, ax = plt.subplots(nrows = 1, ncols = 2, figsize = (12,6))
+    # fig, ax = plt.subplots(nrows = 1, ncols = 2, figsize = (12,6))
 
-    ax[0].imshow(albedoIm, cmap='gray')
-    ax[1].imshow(normalIm, cmap='gray')
-    ax[0].axis('off')
-    ax[1].axis('off')
-    plt.show()
-    plt.clf()
+    # ax[0].imshow(albedoIm, cmap='gray')
+    # ax[1].imshow(normalIm, cmap='gray')
+    # ax[0].axis('off')
+    # ax[1].axis('off')
+    # plt.show()
+    # plt.clf()
 
     surface = estimateShape(normals, s)
-    # plotSurface(surface)
+    plotSurface(surface)

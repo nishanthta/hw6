@@ -226,6 +226,13 @@ def plotSurface(surface):
     plt.show()
 
 
+def normalize(img):
+    min_v, max_v = np.min(img), np.max(img)
+    img = (img - min_v) / (max_v - min_v)
+    return img
+
+
+
 if __name__ == '__main__':
 
     # Put your main code here
